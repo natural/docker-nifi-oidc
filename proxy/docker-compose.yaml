@@ -1,0 +1,19 @@
+version: '3'
+
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "8888:8888"
+      - "9443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./ssl-certs:/etc/nginx/certs
+
+  oidc:
+    image: oidc_testprovider:latest
+    expose:
+      - "8888"
+    environment:
+      - VIRTUAL_HOST=oidc.127.0.0.1.nip.io

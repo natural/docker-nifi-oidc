@@ -147,3 +147,6 @@ def _delete_user(obj):
 
 
 ACCOUNT_DELETION_MARK_CALLBACK = _delete_user
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

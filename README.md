@@ -13,16 +13,19 @@ for more.
 
 ### Names and Ports
 
-`nifi.127.0.0.1.nip.io # Resolves to our NiFi node`
-`oidc.127.0.0.1.nip.io # Resolves to our OIDC service`
+```
+nifi.127.0.0.1.nip.io # Resolves to our NiFi node
+oidc.127.0.0.1.nip.io # Resolves to our OIDC service
 
-`nifi.127.0.0.1.nip.io:8443 # NiFi Web UI HTTPS`
-`oidc.127.0.0.1.nip.io:9443 # OIDC Web UI HTTPS`
-`oidc.127.0.0.1.nip.io:8888 # OIDC Web UI HTTP`
+nifi.127.0.0.1.nip.io:8443 # NiFi Web UI HTTPS
+oidc.127.0.0.1.nip.io:9443 # OIDC Web UI HTTPS
+oidc.127.0.0.1.nip.io:8888 # OIDC Web UI HTTP
+```
 
 
-### `nifi.properties`
+### Changes to `nifi.properties`
 
+```
 nifi.security.keystore=./conf/keystore.jks
 nifi.security.keystoreType=jks
 nifi.security.keystorePasswd=xPmBPKqmoEg4y/nH3hKbGecMrw03KiI3gJhxlaPfpRk
@@ -39,14 +42,12 @@ nifi.security.user.oidc.additional.scopes=profile
 nifi.security.user.oidc.claim.identifying.user=
 nifi.security.user.oidc.tls.client.auth=NONE
 nifi.security.user.oidc.tls.protocol=
+```
 
-### `authorizers.xml`
-
-### OIDC
-
+### Changes `authorizers.xml`
 
 
-## Setup
+## Local Environment Setup
 
 ### NiFi Setup Overview
 
@@ -59,10 +60,10 @@ nifi.security.user.oidc.tls.protocol=
 
 Toolkit usage:
 
-`$ cd nifi-toolkit-1.11.1`
-`$ bin/tls-toolkit.sh standalone -n 'nifi.127.0.0.1.nip.io' -C 'CN=<yourname>, OU=NIFI' -O -o <yourdirectory> -d 300`
-
-
+```
+$ cd nifi-toolkit-1.11.1
+$ bin/tls-toolkit.sh standalone -n 'nifi.127.0.0.1.nip.io' -C 'CN=<yourname>, OU=NIFI' -O -o <yourdirectory> -d 300
+```
 
 
 ### OIDC Provider Setup Overview
@@ -76,6 +77,23 @@ Toolkit usage:
 
 Generate certs, start services:
 
-`$ cd proxy`
-`$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ``pwd``/ssl-certs/oidc.127.0.0.1.nip.io.key -out ``pwd``/ssl-certs/oidc.127.0.0.1.nip.io.crt -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName='DNS:oidc.127.0.0.1.nip.io'"))`
-`$ docker-compose up`
+```
+$ cd proxy
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout `pwd`/ssl-certs/oidc.127.0.0.1.nip.io.key -out `pwd`/ssl-certs/oidc.127.0.0.1.nip.io.crt -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName='DNS:oidc.127.0.0.1.nip.io'"))
+$ docker-compose up
+```
+
+
+### Integration Overview
+
+* Add the SSL certificate created for the OIDC Provider your browser or operating system trust store
+* Add the SSL certificate created for the OIDC Provider to the trust store used by the NiFi node
+
+
+### Cleanup
+
+* Stop docker services
+* Remove docker containers
+* Stop NiFi node
+* Remove NiFi installation
+* Remove SSL certificates

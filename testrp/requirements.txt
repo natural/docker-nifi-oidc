@@ -1,6 +1,0 @@
-django
-djangorestframework
-python-decouple
-mozilla-django-oidc
-six
-splinter

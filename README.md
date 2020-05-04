@@ -1,98 +1,81 @@
-# docker-test-mozilla-django-oidc
+# docker-nifi-oidc
 
-The purpose of these docker images is to setup a local environment to develop and test
-`mozilla-django-oidc`.
+These docker images and scripts are used to create a local environment for the development
+and test of NiFi OIDC functionality.
 
-
-## oidc-testprovider
-
-https://hub.docker.com/r/mozilla/oidc-testprovider/tags?name=testprovider
-
-* Provides a docker image for an OIDC OP with preconfigured OIDC client IDs and secrets
-* OIDC provider endpoint is exposed in port `8080`
-* Provides a Django management command for creating users
-* Uses `django-oidc-provider`
+This repo was originally based on
+[docker-test-mozilla-django-oidc](https://github.com/mozilla/docker-test-mozilla-django-oidc).  Refer to
+[the README.md](https://github.com/mozilla/docker-test-mozilla-django-oidc/blob/master/README.md) in that repo
+for more.
 
 
-### Usage
+## Configuration Summary
 
-In order for this setup to work `testprovider`, `testrp` hostnames should resolve to the
-IP of the docker image (for local development it's `127.0.0.1`).
+### Names and Ports
 
-You can add the resolution to your `/etc/hosts` file.
+`nifi.127.0.0.1.nip.io # Resolves to our NiFi node`
+`oidc.127.0.0.1.nip.io # Resolves to our OIDC service`
 
-You can also use [nip.io](http://nip.io/). For example, if you name the service
-"oidcprovider", then you could have these three variables:
-
-```
-OIDC_OP_AUTHORIZATION_ENDPOINT=http://oidcprovider.127.0.0.1.nip.io:8080/openid/authorize
-OIDC_OP_TOKEN_ENDPOINT=http://oidcprovider.127.0.0.1.nip.io:8080/openid/token
-OIDC_OP_USER_ENDPOINT=http://oidcprovider.127.0.0.1.nip.io:8080/openid/userinfo
-```
-
-### Example setup
-
-`docker-compose.yml`
-
-```
-version: '3'
-services:
-  testprovider:
-    image: mozilla/oidc-testprovider:oidc_testprovider-v0.9.3
-    ports:
-      - "8080:8080"
-```
+`nifi.127.0.0.1.nip.io:8443 # NiFi Web UI HTTPS`
+`oidc.127.0.0.1.nip.io:9443 # OIDC Web UI HTTPS`
+`oidc.127.0.0.1.nip.io:8888 # OIDC Web UI HTTP`
 
 
-### Creating users in the container
+### `nifi.properties`
 
-The `testprovider` image has a Django management command for creating users in
-the OIDC provider. This lets you create users on the command line.
+nifi.security.keystore=./conf/keystore.jks
+nifi.security.keystoreType=jks
+nifi.security.keystorePasswd=xPmBPKqmoEg4y/nH3hKbGecMrw03KiI3gJhxlaPfpRk
+nifi.security.keyPasswd=xPmBPKqmoEg4y/nH3hKbGecMrw03KiI3gJhxlaPfpRk
+nifi.security.truststore=./conf/truststore.jks
+nifi.security.truststoreType=jks
+nifi.security.truststorePasswd=Ryz8DfwhIP0z4xZDyBo9wCmGKMejwk4J+DhMiEzyCm8
 
-With an already running `testprovider` container run:
+nifi.security.user.oidc.discovery.url=https://oidc.127.0.0.1.nip.io:9443/openid/.well-known/openid-configuration
+nifi.security.user.oidc.client.id=779980
+nifi.security.user.oidc.client.secret=31147e6a2a63440d2cca5e2c042d9662b3db1792d386cacb71ac6581
+nifi.security.user.oidc.preferred.jwsalgorithm=HS256
+nifi.security.user.oidc.additional.scopes=profile
+nifi.security.user.oidc.claim.identifying.user=
+nifi.security.user.oidc.tls.client.auth=NONE
+nifi.security.user.oidc.tls.protocol=
 
-```
-docker-compose exec testprovider manage.py createuser USERNAME PASSWORD EMAIL
-```
+### `authorizers.xml`
 
-
-## Other images
-
-All images are pushed to: https://hub.docker.com/r/mozilla/oidc-testprovider
-
-* `oidc_testprovider` (See above)
-* `oidc_testrunner`
-* `oidc_testrp_py{2,3}`
-    * Test django project preconfigured to work with `testprovider`
-    * Uses `mozilla-django-oidc` as an authentication backend
-    * Test RP is exposed in port `8081`
-    * Builds based in both python 2/3
-    * Environment variables
-        * `TEST_OIDC_ALGO={hs,rs}`
-* `oidc_e2e_setup_py{2,3}`
-    * Dockerized setup for e2e testing of mozilla-django-oidc
+### OIDC
 
 
-### Example setup for oidc_testrp
 
-`docker-compose.yml`
+## Setup
 
-```
-version: '3'
-services:
-  testrp:
-    image: mozilla/oidc-testprovider:oidc_testrp_py3-v0.9.3
-    ports:
-      - "8081:8081"
-    environment:
-      - TEST_OIDC_ALGO=hs
-```
+### NiFi Setup Overview
 
-## Development
+* [Install NiFi](https://nifi.apache.org/docs/nifi-docs/html/getting-started.html#downloading-and-installing-nifi) from [source](https://gitbox.apache.org/repos/asf?p=nifi.git) or a [binary release](https://nifi.apache.org/download.html)
+* [Instalfl NiFi Toolkit](https://nifi.apache.org/docs/nifi-docs/html/toolkit-guide.html) from [source](https://gitbox.apache.org/repos/asf?p=nifi.git) or a [binary release](https://nifi.apache.org/download.html)
+* Use the toolkit to generate a keystore and truststore
+* Configure NiFi for HTTPS
 
-We use `make` to automate the docker image workflow.
+### NiFi Setup Instructions
 
-For more info run `make help`.
+Toolkit usage:
 
-Pushing a tag to GitHub will trigger building images and uploading them
-to Dockerhub.
+`$ cd nifi-toolkit-1.11.1`
+`$ bin/tls-toolkit.sh standalone -n 'nifi.127.0.0.1.nip.io' -C 'CN=<yourname>, OU=NIFI' -O -o <yourdirectory> -d 300`
+
+
+
+
+### OIDC Provider Setup Overview
+
+* Clone this repo
+* Start the docker services
+* Configure the OIDC Provider for the NiFi Client
+
+### OIDC Provder Setup Instructions
+
+
+Generate certs, start services:
+
+`$ cd proxy`
+`$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ``pwd``/ssl-certs/oidc.127.0.0.1.nip.io.key -out ``pwd``/ssl-certs/oidc.127.0.0.1.nip.io.crt -extensions SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName='DNS:oidc.127.0.0.1.nip.io'"))`
+`$ docker-compose up`

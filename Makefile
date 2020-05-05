@@ -1,8 +1,7 @@
 DEFAULT_GOAL := help
 
-IMAGES := oidc_testprovider
+IMAGES := nifi-oidc-test-provider
 BUILD := $(addprefix build-,${IMAGES})
-PULL := $(addprefix pull-,$(IMAGES))
 CLEAN := $(addprefix clean-,$(IMAGES))
 
 .PHONY: help
@@ -12,15 +11,12 @@ help:
 .PHONY: build
 build: ${BUILD} ## Build all images
 
-.PHONY: pull
-pull: ${PULL} ## Pull all -latest images
-
 .PHONY: clean
 clean: ${CLEAN} ## Clean images and other artifacts
 
 .PHONY: ${BUILD}
 ${BUILD}: build-%:
-	docker build -t $* -f dockerfiles/$* .
+	docker build -t $* -f services/$* .
 
 .PHONY: ${CLEAN}
 ${CLEAN}: clean-%:

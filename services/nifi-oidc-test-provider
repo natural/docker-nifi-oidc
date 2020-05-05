@@ -1,6 +1,6 @@
 FROM python:3.6
 EXPOSE 8888
-COPY testprovider /code/
+COPY test-provider /code/
 WORKDIR /code
 
 RUN pip install -r requirements.txt

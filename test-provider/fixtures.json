@@ -1,10 +1,36 @@
 [
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username": "admin",
+            "password": "pbkdf2_sha256$150000$XaCK22yjb25S$w/mWuEFfJDskTkyaUhutF9/wyCjUFvswcsMRojgQsvE=",
+            "email": "admin@example.com",
+            "is_superuser": true,
+            "is_staff": true,
+            "is_active": true
+        }
+    },
+
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+           "username": "tester",
+            "password": "pbkdf2_sha256$150000$XaCK22yjb25S$w/mWuEFfJDskTkyaUhutF9/wyCjUFvswcsMRojgQsvE=",
+            "email": "tester@example.com",
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true
+        }
+    },
+
   {
     "model": "sites.site",
     "pk": 1,
     "fields": {
       "domain": "oidcprovider.127.0.0.1.nip.io:8888",
-      "name": "testprovider"
+      "name": "NiFi - OIDC - Test Provider"
     }
   },
   {

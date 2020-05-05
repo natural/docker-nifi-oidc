@@ -9,7 +9,7 @@ services:
       - "9443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ../ssl-certs:/etc/nginx/certs
+      - ./ssl-oidc:/etc/nginx/certs
 
   oidc:
     image: nifi-oidc-test-provider:latest
